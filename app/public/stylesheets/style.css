@@ -1,0 +1,38 @@
+body {
+  box-sizing: border-box;
+  font: 25px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin:0;
+  padding: 0%;
+}
+
+a {
+  color: #00B7FF;
+}
+h1 {
+  
+  margin: auto;
+}
+p {
+  font-size: large  ;
+}
+.container {
+  margin: auto;
+  background-color: #00B7FF;
+  padding: 3em;
+  width: 50%;
+  border-radius: 10px;
+  text-align: center;
+}
+.container2 {
+  text-align: center;
+  margin: auto;
+  background-color: #0ecaaa;
+  padding: 3em;
+  width: 50%;
+  border-radius: 10px;
+}
+div.container2:nth-child(odd
+) {
+  
+ color: red
+}
