@@ -24,7 +24,7 @@ const upload = multer({ storage: storage,  fileFilter: (req, file, callback) => 
     callback(null, true);
   } else {
     callback(null, false);
-    return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+    return callback(new Error('Only .png, .jpg and .jpeg format allowed!'));
   }
 } })
 
@@ -65,9 +65,9 @@ router.post('/upload', upload.single('file'),(req, res) => {
 router.get('/', async (req, res) => {
   const firsthash = bcrypt.hashSync("anisddd", 10)
 
-const eval = await bcrypt.compare("anisddd", firsthash).valueOf()
+const evaluation = await bcrypt.compare("anisddd", firsthash).valueOf()
   console.log(eval)
-  res.json({firsthash: firsthash , eval: eval.toString()})
+  res.json({firsthash: firsthash , evaluation: evaluation.toString()})
 })
 
 

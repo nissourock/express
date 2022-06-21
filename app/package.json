@@ -12,7 +12,10 @@
   "start": "node ./bin/www",
   
     
-  "seed": "node ./prisma/seed"
+  "seed": "node ./prisma/seed",
+  
+    
+  "test": "jest --verbose"
   
   },
   
@@ -59,7 +62,32 @@
   "@types/express": "^4.17.13",
   
     
+  "dotenv": "^16.0.1",
+  
+    
+  "eslint": "^8.18.0",
+  
+    
+  "eslint-config-prettier": "^8.5.0",
+  
+    
+  "jest": "^28.1.1",
+  
+    
+  "jsonwebtoken": "^8.5.1",
+  
+    
+  "prettier": "^2.7.1",
+  
+    
   "prisma": "^3.15.1"
+  
+  },
+  
+  "jest": {
+  
+    
+  "testEnvironment": "node"
   
   }
 }

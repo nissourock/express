@@ -67,10 +67,11 @@ const load = async () => {
 
     } catch (e) {
         console.error(e);
+        // eslint-disable-next-line no-undef
         process.exit(1);
     } finally {
         console.log("added successfully")
         await prisma.$disconnect();
-    };
+    }
 }
 load();
