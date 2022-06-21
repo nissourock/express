@@ -24,7 +24,7 @@ const other = myarray.map((fruit) => {
   else
     return { ...displayfruit, [fruit]: "This is not a fruit" };
 });
-console.log(other);
+// console.log(other);
 /* GET users listing. */
 router.get("/all", async function (req, res, next) {
   const data = await prisma.student.findMany()
@@ -32,9 +32,13 @@ router.get("/all", async function (req, res, next) {
 
   next()
 });
+
+
+
+
 router.get("/all_paginated", async function (req, res, next) {
   const currentPage = parseInt(req.query.page) || 1;
-  const listPerPage = 4;
+  const listPerPage = parseInt(req.query.listperPage) || 1;
   const offset = (currentPage - 1) * listPerPage;
   const userscount = await prisma.student.count();
   if ((userscount % listPerPage) === 0) { const totalPages = (userscount / listPerPage) }
@@ -56,6 +60,7 @@ router.get("/all_paginated", async function (req, res, next) {
   next()
 });
 
+
 router.get("/view/:userid", async function (req, res, next) {
   const userid = parseInt(req.params.userid)
   const data = await prisma.student.findMany({
@@ -67,9 +72,9 @@ router.get("/view/:userid", async function (req, res, next) {
 
 
 });
-router.get("/*", function (req, res, next) {
-  res.send(404)
-});
+// router.get("/*", function (req, res, next) {
+//   res.send(404)
+// });
 
 router.post("/", async function (req, res, next) {
   const { firstName, lastName, passWord, levelId, isHot } = req.body
@@ -87,5 +92,10 @@ router.post("/", async function (req, res, next) {
 
   next()
 });
+
+
+
+
+
 
 module.exports = router;

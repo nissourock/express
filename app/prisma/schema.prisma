@@ -12,19 +12,20 @@ model attendance_student {
   session_id Int
   student_id Int
   is_present Boolean
-  session    session @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student    student @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  session    session @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  student    student @relation(fields: [student_id], references: [id], onDelete: Cascade)
 }
 
 model course {
   id              Int               @id @default(autoincrement())
   course_name     String?
   course_level_id Int
-  level           level             @relation(fields: [course_level_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  level           level             @relation(fields: [course_level_id], references: [id], onDelete: Cascade)
   course_material course_material[]
   private_session private_session[]
   prof            prof[]
   session         session[]
+  student_course  student_course[]
 }
 
 model course_material {
@@ -33,8 +34,8 @@ model course_material {
   material_description String?
   course_id            Int?
   prof_id              Int?
-  course               course? @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  prof                 prof?   @relation(fields: [prof_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course               course? @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  prof                 prof?   @relation(fields: [prof_id], references: [id], onDelete: Cascade)
 }
 
 model level {
@@ -54,10 +55,10 @@ model private_session {
   level_id       Int
   date_occurence DateTime? @default(now()) @db.Timestamp(6)
   student_id     Int
-  course         course    @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  level          level     @relation(fields: [level_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  prof           prof      @relation(fields: [prof_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  student        student   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  course         course    @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  level          level     @relation(fields: [level_id], references: [id], onDelete: Cascade)
+  prof           prof      @relation(fields: [prof_id], references: [id], onDelete: Cascade)
+  student        student   @relation(fields: [student_id], references: [id], onDelete: Cascade)
 }
 
 model prof {
@@ -66,8 +67,9 @@ model prof {
   last_name       String?
   level_teached   Int
   course_teached  Int
-  course          course            @relation(fields: [course_teached], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  level           level             @relation(fields: [level_teached], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  role            String            @default("prof")
+  course          course            @relation(fields: [course_teached], references: [id], onDelete: Cascade)
+  level           level             @relation(fields: [level_teached], references: [id], onDelete: Cascade)
   course_material course_material[]
   private_session private_session[]
   session         session[]
@@ -87,10 +89,10 @@ model session {
   session_start      DateTime?            @default(now()) @db.Timestamp(6)
   course_prof_name   Int?
   room_id            Int                  @default(1)
-  prof               prof?                @relation(fields: [course_prof_name], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  room               room                 @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  course             course               @relation(fields: [session_course], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  level              level                @relation(fields: [session_level], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  prof               prof?                @relation(fields: [course_prof_name], references: [id], onDelete: Cascade)
+  room               room                 @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  course             course               @relation(fields: [session_course], references: [id], onDelete: Cascade)
+  level              level                @relation(fields: [session_level], references: [id], onDelete: Cascade)
   attendance_student attendance_student[]
 }
 
@@ -98,12 +100,34 @@ model student {
   id                 Int                  @id @default(autoincrement())
   first_name         String
   last_name          String?
-  password           String               @default("please add me")
   date_joined        DateTime?            @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime             @default(now()) @db.Timestamp(6) @updatedAt
   level_id           Int                  @default(3)
-  level              level                @relation(fields: [level_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  password           String               @default("please add me")
+  role               String               @default("student")
+  level              level                @relation(fields: [level_id], references: [id], onDelete: NoAction)
+  
   attendance_student attendance_student[]
   private_session    private_session[]
+  student_course     student_course[]
 
   @@index([id], map: "fki_student_level")
+}
+
+model admin {
+  id           Int       @id @default(autoincrement())
+  first_name   String
+  last_name    String?
+  password     String    @default("please add me")
+  date_created DateTime? @default(now()) @db.Timestamp(6)
+  role         String    @default("admin")
+}
+
+model student_course {
+  id              Int       @id @default(autoincrement())
+  date_enrollment DateTime? @default(now()) @db.Timestamp(6)
+  course_id       Int?
+  student_id      Int?
+  course          course?   @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  student         student?  @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
