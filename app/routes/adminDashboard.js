@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
+// eslint-disable-next-line no-unused-vars
 const { join } = require('@prisma/client/runtime');
 const prisma = new PrismaClient();
 /* GET home page. */
@@ -21,12 +22,12 @@ const auth = async (req, res, next) => {
 // }
 
 
-router.get('/', async function(req, res, next) {
+router.get('/', async function(req, res) {
     const admin = await prisma.admin.findMany()
   res.json(admin)
 });
 
-router.get('/students/all', auth, async function (req, res, next) {
+router.get('/students/all', auth, async function (req, res) {
     try {
         const students = await prisma.student.findMany({orderBy: [{updatedAt : 'desc'}]},{ include: { 
             attendance_student: true,
@@ -40,7 +41,7 @@ router.get('/students/all', auth, async function (req, res, next) {
     }
     
 });
-router.get('/students/:studentid',auth,  async function(req, res, next) {
+router.get('/students/:studentid',auth,  async function(req, res) {
     const {studentid} = req.params
 
     try {
@@ -60,7 +61,7 @@ router.get('/students/:studentid',auth,  async function(req, res, next) {
 
 });
 
-router.post('/students/update/:studentid',auth,  async function(req, res, next) {
+router.post('/students/update/:studentid',auth,  async function(req, res) {
     const {studentid} = req.params
     const {newname, newsurname} = req.body
     prisma.student.update({where: {id: parseInt(studentid)}, data: {first_name: newname, last_name: newsurname}})
@@ -69,12 +70,12 @@ router.post('/students/update/:studentid',auth,  async function(req, res, next) 
 });
 
 
-router.get('/profs/all',auth,  async function(req, res, next) {
+router.get('/profs/all',auth,  async function(req, res) {
     const profs = await prisma.prof.findMany()
   return res.send(profs);
   
 });
-router.get('/profs/:profid',auth,  async function(req, res, next) {
+router.get('/profs/:profid',auth,  async function(req, res) {
     const {profid} = req.params
     try {
         const prof_course = await prisma.prof.findUnique({where: {id: parseInt(profid)}}).course()
@@ -88,7 +89,7 @@ router.get('/profs/:profid',auth,  async function(req, res, next) {
     }
 }) 
 
-router.get('/level/all',auth,  async function(req, res, next) {
+router.get('/level/all',auth,  async function(req, res) {
         const profs = await prisma.level.findMany()
       return res.send(profs);  
 });

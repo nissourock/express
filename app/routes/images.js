@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const express = require('express')
 const router = express.Router();
 const fs = require('fs');
@@ -34,6 +35,7 @@ It is interesting to note that node.js handles filepaths differently than javasc
 I should try to learn more about relative and absolute filepaths. */
 
 const relativePath = (directory) => {
+    // eslint-disable-next-line no-undef
     return (path.join(__dirname, directory))
 }
 
