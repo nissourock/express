@@ -7,20 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// The question mark identifier on type modifier means that column can be null.
+
 model attendance_student {
   id         Int     @id @default(autoincrement())
   session_id Int
   student_id Int
   is_present Boolean
-  session    session @relation(fields: [session_id], references: [id], onDelete: Cascade)
-  student    student @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  session    session @relation(fields: [session_id], references: [id], onDelete: NoAction)
+  student    student @relation(fields: [student_id], references: [id], onDelete: NoAction)
 }
 
 model course {
   id              Int               @id @default(autoincrement())
-  course_name     String?
+  course_name     String
   course_level_id Int
-  level           level             @relation(fields: [course_level_id], references: [id], onDelete: Cascade)
+  level           level             @relation(fields: [course_level_id], references: [id], onDelete: NoAction)
   course_material course_material[]
   private_session private_session[]
   prof            prof[]
@@ -30,10 +32,10 @@ model course {
 
 model course_material {
   id                   Int     @id @default(autoincrement())
-  material_title       String?
-  material_description String?
-  course_id            Int?
-  prof_id              Int?
+  material_title       String
+  material_description String
+  course_id            Int
+  prof_id              Int
   course               course? @relation(fields: [course_id], references: [id], onDelete: Cascade)
   prof                 prof?   @relation(fields: [prof_id], references: [id], onDelete: Cascade)
 }
@@ -49,27 +51,31 @@ model level {
 }
 
 model private_session {
-  id             Int       @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   course_id      Int
   prof_id        Int
   level_id       Int
-  date_occurence DateTime? @default(now()) @db.Timestamp(6)
+  date_occurence DateTime @default(now()) @db.Timestamp(6)
   student_id     Int
-  course         course    @relation(fields: [course_id], references: [id], onDelete: Cascade)
-  level          level     @relation(fields: [level_id], references: [id], onDelete: Cascade)
-  prof           prof      @relation(fields: [prof_id], references: [id], onDelete: Cascade)
-  student        student   @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  course         course   @relation(fields: [course_id], references: [id], onDelete: NoAction)
+  level          level    @relation(fields: [level_id], references: [id], onDelete: NoAction)
+  prof           prof     @relation(fields: [prof_id], references: [id], onDelete: NoAction)
+  student        student  @relation(fields: [student_id], references: [id], onDelete: NoAction)
 }
 
 model prof {
   id              Int               @id @default(autoincrement())
-  first_name      String?
-  last_name       String?
+  first_name      String
+  last_name       String
+  username        String            @default("please add me")
   level_teached   Int
   course_teached  Int
   role            String            @default("prof")
-  course          course            @relation(fields: [course_teached], references: [id], onDelete: Cascade)
-  level           level             @relation(fields: [level_teached], references: [id], onDelete: Cascade)
+  password        String            @default("please add me")
+  date_joined     DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamp(6)
+  course          course            @relation(fields: [course_teached], references: [id], onDelete: NoAction)
+  level           level             @relation(fields: [level_teached], references: [id], onDelete: NoAction)
   course_material course_material[]
   private_session private_session[]
   session         session[]
@@ -86,27 +92,28 @@ model session {
   id                 Int                  @id @default(autoincrement())
   session_level      Int
   session_course     Int
-  session_start      DateTime?            @default(now()) @db.Timestamp(6)
+  session_start      DateTime             @default(now()) @db.Timestamp(6)
   course_prof_name   Int?
   room_id            Int                  @default(1)
-  prof               prof?                @relation(fields: [course_prof_name], references: [id], onDelete: Cascade)
-  room               room                 @relation(fields: [room_id], references: [id], onDelete: Cascade)
-  course             course               @relation(fields: [session_course], references: [id], onDelete: Cascade)
-  level              level                @relation(fields: [session_level], references: [id], onDelete: Cascade)
+  prof               prof?                @relation(fields: [course_prof_name], references: [id], onDelete: NoAction)
+  room               room                 @relation(fields: [room_id], references: [id], onDelete: NoAction)
+  course             course               @relation(fields: [session_course], references: [id], onDelete: NoAction)
+  level              level                @relation(fields: [session_level], references: [id], onDelete: NoAction)
   attendance_student attendance_student[]
 }
 
 model student {
-  id                 Int                  @id @default(autoincrement())
-  first_name         String
-  last_name          String?
-  date_joined        DateTime?            @default(now()) @db.Timestamp(6)
-  updatedAt          DateTime             @default(now()) @db.Timestamp(6) @updatedAt
-  level_id           Int                  @default(3)
-  password           String               @default("please add me")
-  role               String               @default("student")
-  level              level                @relation(fields: [level_id], references: [id], onDelete: NoAction)
-  
+  id          Int      @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  username    String   @default("please add me")
+  date_joined DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  level_id    Int      @default(3)
+  password    String   @default("please add me")
+  role        String   @default("student")
+  level       level    @relation(fields: [level_id], references: [id], onDelete: NoAction)
+
   attendance_student attendance_student[]
   private_session    private_session[]
   student_course     student_course[]
@@ -115,12 +122,14 @@ model student {
 }
 
 model admin {
-  id           Int       @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   first_name   String
-  last_name    String?
-  password     String    @default("please add me")
-  date_created DateTime? @default(now()) @db.Timestamp(6)
-  role         String    @default("admin")
+  last_name    String
+  username     String   @default("please add me")
+  password     String   @default("please add me")
+  date_created DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @default(now()) @updatedAt @db.Timestamp(6)
+  role         String   @default("admin")
 }
 
 model student_course {
