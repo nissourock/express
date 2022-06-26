@@ -1,10 +1,8 @@
 const express = require('express');
-const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-const bcrypt = require('bcrypt');
+const router = express.Router;
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
+const {studentLogin} = require('../utils/login/studentLogin')
 
 dotenv.config();
 
@@ -14,19 +12,19 @@ dotenv.config();
 // eslint-disable-next-line no-undef
 const SECRET = process.env.JWT_SECRET;
 
-const studentLogin = async (req, res, next) => {
-    try {
-        const user = await prisma.student.findUnique({ where: { id: req.body.userID } })
-        if (user && req.body.password && (await bcrypt.compare(req.body.password, user.password))) { 
-            res.locals.user = user ;    next()  
-        } else {
-             res.sendStatus(401) 
-            }
-        } 
-        catch (error) {
-        res.json(error)
-        }
-}
+/* Routes needed: 
+Login, verify
+1- GET
+- get courses enrolled in (profs, level should be included too)
+- get schedule (sessions to come and sessions past)
+- get attendance 
+- get payment situation
+- get course materials
+- get notifications
+2- POST/UPDATE 
+- sign-up with name, email, course_wish_list
+- credentials, profile picture (UPDATE)
+ */
 
 
 
@@ -80,17 +78,8 @@ router.get('/verify',checkToken, async (req, res) =>
         });
     
     });
-// router.get('/verify', async (req, res) => {
-//     let token = req.headers["x-access-token"];
-    
-//     if (!token) {
-//     return res.status(403).send({
-//       message: "No token provided!"
-//     });
-//   }
-//   jwt.verify(token, SECRET).then(decoded => console.log(decoded)).catch(err => console.error(err))
-//     res.sendStatus(200)
-// })
+
+
 
  
 

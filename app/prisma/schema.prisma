@@ -2,12 +2,40 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 // The question mark identifier on type modifier means that column can be null.
+model payment_cycle {
+  id              Int               @id @default(autoincrement())
+  cycle_start     DateTime
+  cycle_end       DateTime
+  student_payment student_payment[]
+
+
+}
+
+model student_payment {
+  id            Int           @id @default(autoincrement())
+  cycle_id      Int
+  payment_cycle payment_cycle @relation(fields: [cycle_id], references: [id], onDelete: NoAction)
+  student_id    Int
+  student       student       @relation(fields: [student_id], references: [id], onDelete: NoAction)
+  isPaid        Boolean       @default(false)
+
+}
+
+model private_session_payment {
+  id                 Int             @id @default(autoincrement())
+  private_session_id Int
+  private_session    private_session @relation(fields: [private_session_id], references: [id], onDelete: NoAction)
+}
 
 model attendance_student {
   id         Int     @id @default(autoincrement())
@@ -22,6 +50,7 @@ model course {
   id              Int               @id @default(autoincrement())
   course_name     String
   course_level_id Int
+  description     String?
   level           level             @relation(fields: [course_level_id], references: [id], onDelete: NoAction)
   course_material course_material[]
   private_session private_session[]
@@ -51,16 +80,17 @@ model level {
 }
 
 model private_session {
-  id             Int      @id @default(autoincrement())
-  course_id      Int
-  prof_id        Int
-  level_id       Int
-  date_occurence DateTime @default(now()) @db.Timestamp(6)
-  student_id     Int
-  course         course   @relation(fields: [course_id], references: [id], onDelete: NoAction)
-  level          level    @relation(fields: [level_id], references: [id], onDelete: NoAction)
-  prof           prof     @relation(fields: [prof_id], references: [id], onDelete: NoAction)
-  student        student  @relation(fields: [student_id], references: [id], onDelete: NoAction)
+  id                      Int                       @id @default(autoincrement())
+  course_id               Int
+  prof_id                 Int
+  level_id                Int
+  date_occurence          DateTime                  @default(now()) @db.Timestamp(6)
+  student_id              Int
+  course                  course                    @relation(fields: [course_id], references: [id], onDelete: NoAction)
+  level                   level                     @relation(fields: [level_id], references: [id], onDelete: NoAction)
+  prof                    prof                      @relation(fields: [prof_id], references: [id], onDelete: NoAction)
+  student                 student                   @relation(fields: [student_id], references: [id], onDelete: NoAction)
+  private_session_payment private_session_payment[]
 }
 
 model prof {
@@ -117,8 +147,25 @@ model student {
   attendance_student attendance_student[]
   private_session    private_session[]
   student_course     student_course[]
+  student_payment    student_payment[]
+  student_info       student_info[]
 
   @@index([id], map: "fki_student_level")
+}
+
+model student_info {
+  id         Int     @id @default(autoincrement())
+  student_id Int
+  student    student @relation(fields: [student_id], references: [id], onDelete: NoAction)
+  date_birth String?
+  address    String?
+  email      String?
+  contacts   Json[]
+  notes      Json[]
+
+
+
+
 }
 
 model admin {
