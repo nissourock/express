@@ -26,6 +26,7 @@ model student_payment {
   cycle_id      Int
   payment_cycle payment_cycle @relation(fields: [cycle_id], references: [id], onDelete: NoAction)
   student_id    Int
+  paid_amount   Int
   student       student       @relation(fields: [student_id], references: [id], onDelete: NoAction)
   isPaid        Boolean       @default(false)
 
@@ -35,6 +36,25 @@ model private_session_payment {
   id                 Int             @id @default(autoincrement())
   private_session_id Int
   private_session    private_session @relation(fields: [private_session_id], references: [id], onDelete: NoAction)
+  isPaid             Boolean
+  paid_amount        Int
+}
+
+model assignment {
+  id         Int     @id @default(autoincrement())
+  student_id Int
+  student    student @relation(fields: [student_id], references: [id], onDelete: NoAction)
+
+  prof_id Int
+  prof    prof @relation(fields: [prof_id], references: [id], onDelete: NoAction)
+
+  course_id Int
+  course    course @relation(fields: [course_id], references: [id], onDelete: NoAction)
+
+  due_date DateTime
+  comments Json?
+
+
 }
 
 model attendance_student {
@@ -57,6 +77,7 @@ model course {
   prof            prof[]
   session         session[]
   student_course  student_course[]
+  assignment      assignment[]
 }
 
 model course_material {
@@ -109,6 +130,7 @@ model prof {
   course_material course_material[]
   private_session private_session[]
   session         session[]
+  assignment      assignment[]
 }
 
 model room {
@@ -149,6 +171,7 @@ model student {
   student_course     student_course[]
   student_payment    student_payment[]
   student_info       student_info[]
+  assignment         assignment[]
 
   @@index([id], map: "fki_student_level")
 }
