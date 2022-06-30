@@ -2,8 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt')
 const studentLogin = async (req, res, next) => {
+    console.log(req.body)
     try {
-        const user = await prisma.student.findUnique({ where: { id: req.body.userID } })
+        const user = await prisma.student.findUnique({ where: { id: parseInt(req.body.userID )} })
         if (user && req.body.password && (await bcrypt.compare(req.body.password, user.password))) { 
             res.locals.user = user ;    next()  
         } else {
@@ -11,7 +12,9 @@ const studentLogin = async (req, res, next) => {
             }
         } 
         catch (error) {
-        res.json(error)
+            throw Error("No login info provided") 
+        
+        
         }
 }
 const adminLogin = async (req, res, next) => {

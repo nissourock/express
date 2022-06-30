@@ -27,6 +27,7 @@ model student_payment {
   payment_cycle payment_cycle @relation(fields: [cycle_id], references: [id], onDelete: NoAction)
   student_id    Int
   paid_amount   Int
+  rest_amount   Int?
   student       student       @relation(fields: [student_id], references: [id], onDelete: NoAction)
   isPaid        Boolean       @default(false)
 
