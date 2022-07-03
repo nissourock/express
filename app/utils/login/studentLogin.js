@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt')
 const studentLogin = async (req, res, next) => {
-    console.log(req.body)
+    // console.log(req.body)
     try {
         const user = await prisma.student.findUnique({ where: { id: parseInt(req.body.userID )} })
         if (user && req.body.password && (await bcrypt.compare(req.body.password, user.password))) { 

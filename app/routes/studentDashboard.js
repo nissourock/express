@@ -36,37 +36,39 @@ with content: bearer ergelrkgjsdlkfjslcgkjldkjg
         const bearer = header.split(' ');
         const token = bearer[1];
         req.token = token;
-        console.log(header)
+        
         next();
     }
     else {
-        res.sendStatus(403);
+        res.sendStatus(403)
+        throw Error('no token provided')
+        ;
     }
 }
 
 const verify = async function (req, res, next) {
     jwt.verify(req.token, SECRET, function (err, authorizedata) {
         if (err) {
-            console.log(err);
-            res.sendStatus(403);
+            console.error(err);
+            
+            res.sendStatus(403).send("invalid token");
         }
         else {
-            // res.json({
-            //     message : 'Successful log in',
-            //     authorizedata
-            // });
-            next()
+            res.locals.token_data = authorizedata
+            
             console.log('Success : Connected to protected route');
+            next()
         }
 
     })
 }
 
-router.get('/info', studentLogin, checkToken, verify, async (req, res) => {
+router.post('/info',checkToken,verify, async (req, res) => {
+    console.log(res.locals.token_data.id)
     try {
         const students = await prisma.student.findUnique({
             where: {
-                id: res.locals.user.id
+                id: res.locals.token_data.id
             },
             include: {
                 attendance_student: true,
