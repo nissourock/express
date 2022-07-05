@@ -120,6 +120,7 @@ model prof {
   first_name      String
   last_name       String
   username        String            @default("please add me")
+  email           String            @default("please add me")
   level_teached   Int
   course_teached  Int
   role            String            @default("prof")
@@ -160,6 +161,7 @@ model student {
   first_name  String
   last_name   String
   username    String   @default("please add me")
+  email       String   @default("please add me")
   date_joined DateTime @default(now()) @db.Timestamp(6)
   updatedAt   DateTime @default(now()) @updatedAt @db.Timestamp(6)
   level_id    Int      @default(3)
@@ -196,6 +198,7 @@ model admin {
   id           Int      @id @default(autoincrement())
   first_name   String
   last_name    String
+  email        String   @default("please add me")
   username     String   @default("please add me")
   password     String   @default("please add me")
   date_created DateTime @default(now()) @db.Timestamp(6)
