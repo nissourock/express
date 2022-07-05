@@ -22,7 +22,7 @@ const SECRET = process.env.JWT_SECRET;
 
 router.post('/login', studentLogin, async (req, res) => {
 
-    const token = jwt.sign({ id: res.locals.user.id, role: res.locals.user.role }, SECRET, { expiresIn: '1hr' })
+    const token = jwt.sign({ id: res.locals.user.id, role: res.locals.user.role }, SECRET, { expiresIn: '15min' })
 
     res.json([{ user_info: res.locals.user }, { jwt_token: token, time_of_issue: new Date() }]);
 
@@ -30,7 +30,9 @@ router.post('/login', studentLogin, async (req, res) => {
 const checkToken = function (req, res, next)
 /* In this implementation, the token should be sent as a request header : x-access-token
 with content: bearer ergelrkgjsdlkfjslcgkjldkjg
+
  */ {
+    console.log(req.headers)
     const header = req.headers['x-access-token'];
     if (typeof header !== 'undefined') {
         const bearer = header.split(' ');
@@ -40,18 +42,18 @@ with content: bearer ergelrkgjsdlkfjslcgkjldkjg
         next();
     }
     else {
-        res.sendStatus(403)
+        
         throw Error('no token provided')
         ;
     }
 }
 
-const verify = async function (req, res, next) {
+const verify_token = async function (req, res, next) {
     jwt.verify(req.token, SECRET, function (err, authorizedata) {
         if (err) {
             console.error(err);
             
-            res.sendStatus(403).send("invalid token");
+            res.sendStatus(403);
         }
         else {
             res.locals.token_data = authorizedata
@@ -63,8 +65,8 @@ const verify = async function (req, res, next) {
     })
 }
 
-router.post('/info',checkToken,verify, async (req, res) => {
-    console.log(res.locals.token_data.id)
+router.post('/info',checkToken,verify_token, async (req, res) => {
+    
     try {
         const students = await prisma.student.findUnique({
             where: {
@@ -75,7 +77,7 @@ router.post('/info',checkToken,verify, async (req, res) => {
                 student_course: true
             }
         })
-
+        
         res.json(students)
 
     } catch (error) {
